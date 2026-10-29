@@ -38,13 +38,30 @@ code {
 .input-screen {
   display: flex;
   flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
   width: min(100% - 32px, 360px);
+}
+
+.input-screen--populated {
+  align-items: flex-start;
+  top: 16px;
+  left: 16px;
+  width: min(400px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  transform: none;
 }
 
 .input-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 360px;
+  width: min(360px, 100%);
 }
 
 .input-label {
@@ -105,6 +122,8 @@ code {
 
 .saved-inputs {
   margin-top: 24px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .saved-inputs-heading {
@@ -120,7 +139,16 @@ code {
   gap: 8px;
 }
 
+.saved-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .saved-input-item {
+  min-width: 0;
+  flex: 1;
   overflow-wrap: anywhere;
   padding: 10px 12px;
   border: 1px solid var(--ev-c-gray-3);
@@ -128,6 +156,42 @@ code {
   background-color: var(--color-background-soft);
   color: var(--ev-c-text-1);
   font-size: 14px;
+}
+
+.delete-input-button {
+  align-items: center;
+  display: flex;
+  flex: 0 0 32px;
+  height: 32px;
+  justify-content: center;
+  padding: 7px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-2);
+  cursor: pointer;
+}
+
+.delete-input-button:hover:not(:disabled) {
+  border-color: #ff8a8a;
+  background-color: #ff8a8a1a;
+  color: #ff8a8a;
+}
+
+.delete-input-button:focus-visible {
+  outline: 2px solid #6988e6;
+  outline-offset: 2px;
+}
+
+.delete-input-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.trash-icon {
+  display: block;
+  height: 16px;
+  width: 16px;
 }
 
 .saved-inputs-empty {

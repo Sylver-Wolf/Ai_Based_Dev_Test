@@ -36,6 +36,21 @@ async function saveInput(input: unknown): Promise<string[]> {
   return savedInputs
 }
 
+async function deleteSavedInput(index: unknown): Promise<string[]> {
+  if (typeof index !== 'number' || !Number.isInteger(index)) {
+    throw new TypeError('Saved input index must be an integer.')
+  }
+
+  const savedInputs = await loadSavedInputs()
+  if (index < 0 || index >= savedInputs.length) {
+    throw new RangeError('Saved input does not exist.')
+  }
+
+  savedInputs.splice(index, 1)
+  await writeFile(savedInputsPath(), `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
+  return savedInputs
+}
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -86,6 +101,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
   ipcMain.handle('saved-inputs:load', () => loadSavedInputs())
   ipcMain.handle('saved-inputs:save', (_event, input: unknown) => saveInput(input))
+  ipcMain.handle('saved-inputs:delete', (_event, index: unknown) => deleteSavedInput(index))
 
   createWindow()
 

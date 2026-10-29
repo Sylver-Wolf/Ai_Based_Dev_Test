@@ -4,7 +4,9 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 const api = {
   loadSavedInputs: (): Promise<string[]> => ipcRenderer.invoke('saved-inputs:load'),
-  saveInput: (input: string): Promise<string[]> => ipcRenderer.invoke('saved-inputs:save', input)
+  saveInput: (input: string): Promise<string[]> => ipcRenderer.invoke('saved-inputs:save', input),
+  deleteSavedInput: (index: number): Promise<string[]> =>
+    ipcRenderer.invoke('saved-inputs:delete', index)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
