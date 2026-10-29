@@ -4,7 +4,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto;
   background-image: url('./wavy-lines.svg');
   background-size: cover;
   user-select: none;
@@ -31,141 +31,106 @@ code {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-bottom: 80px;
+  min-height: 100vh;
+  width: 100%;
 }
 
-.logo {
-  margin-bottom: 20px;
-  -webkit-user-drag: none;
-  height: 128px;
-  width: 128px;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 1.2em #6988e6aa);
-}
-
-.creator {
-  font-size: 14px;
-  line-height: 16px;
-  color: var(--ev-c-text-2);
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.text {
-  font-size: 28px;
-  color: var(--ev-c-text-1);
-  font-weight: 700;
-  line-height: 32px;
-  text-align: center;
-  margin: 0 10px;
-  padding: 16px 0;
-}
-
-.tip {
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--ev-c-text-2);
-  font-weight: 600;
-}
-
-.react {
-  background: -webkit-linear-gradient(315deg, #087ea4 55%, #7c93ee);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-
-.ts {
-  background: -webkit-linear-gradient(315deg, #3178c6 45%, #f0dc4e);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-
-.actions {
+.input-screen {
   display: flex;
-  padding-top: 32px;
-  margin: -6px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-direction: column;
+  width: min(100% - 32px, 360px);
 }
 
-.action {
-  flex-shrink: 0;
-  padding: 6px;
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.action a {
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  border: 1px solid transparent;
-  text-align: center;
+.input-label {
+  color: var(--ev-c-text-1);
+  font-size: 14px;
   font-weight: 600;
-  white-space: nowrap;
-  border-radius: 20px;
-  padding: 0 20px;
-  line-height: 38px;
+}
+
+.user-input {
+  min-width: 0;
+  flex: 1;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
   font-size: 14px;
-  border-color: var(--ev-button-alt-border);
-  color: var(--ev-button-alt-text);
+  outline: none;
+}
+
+.input-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.user-input:focus {
+  border-color: #6988e6;
+  box-shadow: 0 0 0 2px #6988e644;
+}
+
+.submit-button {
+  padding: 0 14px;
+  border: 1px solid var(--ev-button-alt-border);
+  border-radius: 6px;
   background-color: var(--ev-button-alt-bg);
-}
-
-.action a:hover {
-  border-color: var(--ev-button-alt-hover-border);
-  color: var(--ev-button-alt-hover-text);
-  background-color: var(--ev-button-alt-hover-bg);
-}
-
-.versions {
-  position: absolute;
-  bottom: 30px;
-  margin: 0 auto;
-  padding: 15px 0;
-  font-family: 'Menlo', 'Lucida Console', monospace;
-  display: inline-flex;
-  overflow: hidden;
-  align-items: center;
-  border-radius: 22px;
-  background-color: #202127;
-  backdrop-filter: blur(24px);
-}
-
-.versions li {
-  display: block;
-  float: left;
-  border-right: 1px solid var(--ev-c-gray-1);
-  padding: 0 20px;
+  color: var(--ev-button-alt-text);
+  cursor: pointer;
   font-size: 14px;
-  line-height: 14px;
-  opacity: 0.8;
-  &:last-child {
-    border: none;
-  }
+  font-weight: 600;
 }
 
-@media (max-width: 720px) {
-  .text {
-    font-size: 20px;
-  }
+.submit-button:hover:not(:disabled) {
+  background-color: var(--ev-button-alt-hover-bg);
+  color: var(--ev-button-alt-hover-text);
 }
 
-@media (max-width: 620px) {
-  .versions {
-    display: none;
-  }
+.submit-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
-@media (max-width: 350px) {
-  .tip,
-  .actions {
-    display: none;
-  }
+.error-message {
+  margin-top: 12px;
+  color: #ff8a8a;
+  font-size: 14px;
+}
+
+.saved-inputs {
+  margin-top: 24px;
+}
+
+.saved-inputs-heading {
+  margin-bottom: 8px;
+  color: var(--ev-c-text-1);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.saved-inputs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saved-input-item {
+  overflow-wrap: anywhere;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+}
+
+.saved-inputs-empty {
+  color: var(--ev-c-text-2);
+  font-size: 14px;
 }
