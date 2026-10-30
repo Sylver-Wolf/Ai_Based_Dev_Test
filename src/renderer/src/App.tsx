@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type SubmitEvent } from 'react'
 
 function App(): React.JSX.Element {
   const inputPanelRef = useRef<HTMLElement>(null)
@@ -68,7 +68,7 @@ function App(): React.JSX.Element {
     return () => animation.cancel()
   }, [hasSavedInputs, shouldAnimatePosition])
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     if (isLoading || isSaving || deletingIndex !== null) return
 
