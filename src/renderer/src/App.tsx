@@ -16,6 +16,7 @@ function App(): React.JSX.Element {
   const [isSavedListVisible, setIsSavedListVisible] = useState(false)
 
   const hasSavedInputs = savedInputs.length > 0
+  const hasSavedListContent = displayedInputs.length > 0
 
   useEffect(() => {
     if (!isSaving && shouldRestoreInputFocus.current) {
@@ -129,7 +130,9 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <main className="app-screen">
+    <main
+      className={`app-screen${hasSavedInputs || hasSavedListContent ? ' app-screen--populated' : ''}`}
+    >
       <section
         ref={inputPanelRef}
         className={`input-panel${hasSavedInputs ? ' input-panel--populated' : ''}`}
@@ -174,7 +177,7 @@ function App(): React.JSX.Element {
         onTransitionEnd={handleSavedListTransitionEnd}
       >
         {displayedInputs.length > 0 && (
-          <>
+          <div className="saved-inputs-content">
             <h2 className="saved-inputs-heading" id="saved-inputs-heading">
               Saved text
             </h2>
@@ -203,7 +206,7 @@ function App(): React.JSX.Element {
                 </li>
               ))}
             </ul>
-          </>
+          </div>
         )}
       </section>
     </main>

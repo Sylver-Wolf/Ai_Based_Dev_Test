@@ -40,6 +40,13 @@ code {
   width: 100%;
 }
 
+.app-screen--populated {
+  display: grid;
+  grid-template-rows: minmax(104px, auto) minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+
 .input-panel {
   display: flex;
   flex-direction: column;
@@ -54,17 +61,13 @@ code {
 
 .input-panel--populated {
   align-items: flex-start;
-  top: 16px;
-  left: 16px;
+  position: relative;
+  top: auto;
+  left: auto;
+  margin: 16px;
+  max-height: none;
+  overflow: visible;
   transform: none;
-}
-
-.input-panel,
-.saved-inputs {
-  pointer-events: auto;
-}
-
-.input-panel--populated {
   width: min(360px, calc(100vw - 32px));
 }
 
@@ -81,13 +84,56 @@ code {
   pointer-events: none;
   transition:
     opacity 350ms ease,
-    visibility 350ms;
+    visibility 0s linear 350ms;
+}
+
+.saved-inputs {
+  scrollbar-color: var(--ev-c-gray-1) var(--color-background-soft);
+  scrollbar-width: thin;
+}
+
+.saved-inputs::-webkit-scrollbar {
+  width: 10px;
+}
+
+.saved-inputs::-webkit-scrollbar-track {
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+}
+
+.saved-inputs::-webkit-scrollbar-thumb {
+  border: 2px solid var(--color-background-soft);
+  border-radius: 6px;
+  background-color: var(--ev-c-gray-1);
+}
+
+.saved-inputs::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ev-c-gray-2);
+}
+
+.app-screen--populated .saved-inputs {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  grid-row: 2;
+  height: 100%;
+  justify-self: center;
+  max-height: none;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  width: min(400px, calc(100vw - 32px));
 }
 
 .saved-inputs--visible {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  transition-delay: 0s;
 }
 
 .input-panel {
@@ -96,6 +142,11 @@ code {
 
 .saved-inputs {
   z-index: 0;
+}
+
+.saved-inputs-content {
+  margin-top: 16px;
+  width: 100%;
 }
 
 .input-form {
