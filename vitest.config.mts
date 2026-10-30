@@ -15,7 +15,19 @@ export default defineConfig({
         'src/renderer/src/**/*.d.ts',
         'src/renderer/src/**/*.{test,spec}.{ts,tsx}',
         'src/renderer/src/test/**'
-      ]
+      ],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        perFile: {
+          statements: 50,
+          branches: 50,
+          functions: 50,
+          lines: 50
+        }
+      }
     }
   }
 })
