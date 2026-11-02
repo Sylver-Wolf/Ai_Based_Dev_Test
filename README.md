@@ -11,7 +11,7 @@ An Electron application with React and TypeScript
 ### Install
 
 ```bash
-$ npm install
+$ npm ci
 ```
 
 ### Development
@@ -31,4 +31,17 @@ $ npm run build:mac
 
 # For Linux
 $ npm run build:linux
+```
+
+### Tests
+
+```bash
+# Run tests in watch mode
+$ npm run test
+
+# Run tests once
+$ npm run test:run
+
+# Run tests once and generate coverage reports in coverage/
+$ npm run test:coverage
 ```

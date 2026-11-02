@@ -1,7 +1,55 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+const savedInputsPath = (): string => join(app.getPath('userData'), 'saved-inputs.json')
+
+async function loadSavedInputs(): Promise<string[]> {
+  let contents: string
+  try {
+    contents = await readFile(savedInputsPath(), 'utf8')
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return []
+    }
+    throw error
+  }
+
+  const parsed: unknown = JSON.parse(contents)
+  if (!Array.isArray(parsed) || !parsed.every((value) => typeof value === 'string')) {
+    throw new Error('Saved inputs file must contain a JSON array of strings.')
+  }
+
+  return parsed
+}
+
+async function saveInput(input: unknown): Promise<string[]> {
+  if (typeof input !== 'string') {
+    throw new TypeError('Input must be text.')
+  }
+
+  const savedInputs = await loadSavedInputs()
+  savedInputs.push(input)
+  await writeFile(savedInputsPath(), `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
+  return savedInputs
+}
+
+async function deleteSavedInput(index: unknown): Promise<string[]> {
+  if (typeof index !== 'number' || !Number.isInteger(index)) {
+    throw new TypeError('Saved input index must be an integer.')
+  }
+
+  const savedInputs = await loadSavedInputs()
+  if (index < 0 || index >= savedInputs.length) {
+    throw new RangeError('Saved input does not exist.')
+  }
+
+  savedInputs.splice(index, 1)
+  await writeFile(savedInputsPath(), `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
+  return savedInputs
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -51,6 +99,9 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('saved-inputs:load', () => loadSavedInputs())
+  ipcMain.handle('saved-inputs:save', (_event, input: unknown) => saveInput(input))
+  ipcMain.handle('saved-inputs:delete', (_event, index: unknown) => deleteSavedInput(index))
 
   createWindow()
 
