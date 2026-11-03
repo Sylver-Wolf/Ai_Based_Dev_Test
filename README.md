@@ -1,6 +1,7 @@
 # Ai Based Dev Test
 
-An Electron application with React and TypeScript
+An Electron application with React and TypeScript.
+
 The objective of this repo and project is not to create a beautifull app, but solely to understand how to guide an ai to create what i want, and to learn the basics of basics to create a more robust app in the future.
 
 ## Recommended IDE Setup
