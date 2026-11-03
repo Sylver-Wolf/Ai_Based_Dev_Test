@@ -1,10 +1,49 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 
 const savedInputsPath = (): string => join(app.getPath('userData'), 'saved-inputs.json')
+
+async function promptToInstallUpdate(version: string): Promise<void> {
+  try {
+    const { response } = await dialog.showMessageBox({
+      type: 'info',
+      title: 'Mise à jour disponible',
+      message: `La version ${version} a été téléchargée.`,
+      detail: 'Redémarrez l’application pour installer la mise à jour.',
+      buttons: ['Redémarrer maintenant', 'Plus tard'],
+      defaultId: 0,
+      cancelId: 1,
+      noLink: true
+    })
+
+    if (response === 0) {
+      autoUpdater.quitAndInstall(false, true)
+    }
+  } catch (error) {
+    console.error('Unable to prompt to install the downloaded update:', error)
+  }
+}
+
+function checkForUpdates(): void {
+  if (is.dev || process.platform !== 'win32') return
+
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = false
+  autoUpdater.on('error', (error) => {
+    console.error('Automatic update error:', error)
+  })
+  autoUpdater.on('update-downloaded', (event) => {
+    void promptToInstallUpdate(event.version)
+  })
+
+  void autoUpdater.checkForUpdates().catch((error: unknown) => {
+    console.error('Unable to check for updates:', error)
+  })
+}
 
 async function loadSavedInputs(): Promise<string[]> {
   let contents: string
@@ -104,6 +143,7 @@ app.whenReady().then(() => {
   ipcMain.handle('saved-inputs:delete', (_event, index: unknown) => deleteSavedInput(index))
 
   createWindow()
+  checkForUpdates()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
