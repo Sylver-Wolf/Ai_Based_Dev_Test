@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: questboard
+productName: Ai_Based_Dev_Test
 directories:
   buildResources: build
 files:
