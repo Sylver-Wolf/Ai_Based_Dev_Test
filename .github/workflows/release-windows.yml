@@ -1,0 +1,68 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish Windows release
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verify tag belongs to main and matches package version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: pwsh
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$') {
+            throw "Tag '$env:RELEASE_TAG' must be a version tag such as v1.2.3."
+          }
+
+          $packageVersion = node -p "require('./package.json').version"
+          if ($env:RELEASE_TAG -ne "v$packageVersion") {
+            throw "Tag '$env:RELEASE_TAG' does not match package.json version 'v$packageVersion'."
+          }
+
+          git fetch origin main --no-tags
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not fetch the main branch."
+          }
+
+          git merge-base --is-ancestor $env:GITHUB_SHA origin/main
+          if ($LASTEXITCODE -ne 0) {
+            throw "The tagged commit is not on the main branch."
+          }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests and enforce coverage thresholds
+        run: npm run test:coverage
+
+      - name: Build Windows installer
+        run: npm run build
+
+      - name: Publish installer to GitHub Release
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
