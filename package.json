@@ -1,7 +1,7 @@
 {
-  "name": "questboard",
-  "version": "0.0.1",
-  "description": "An application made to create and manage quests !",
+  "name": "Ai_Based_Dev_Test",
+  "version": "0.0.2",
+  "description": "An application made to test some stuff !",
   "main": "./out/main/index.js",
   "author": "Sylver Wolf",
   "homepage": "",
