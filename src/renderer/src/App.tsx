@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type SubmitEvent } from 'react'
+import type { UpdateState } from '../../shared/update'
 
 function App(): React.JSX.Element {
   const inputPanelRef = useRef<HTMLElement>(null)
@@ -12,6 +13,7 @@ function App(): React.JSX.Element {
   const [isSaving, setIsSaving] = useState(false)
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [updateState, setUpdateState] = useState<UpdateState | null>(null)
   const [shouldAnimatePosition, setShouldAnimatePosition] = useState(false)
   const [isSavedListVisible, setIsSavedListVisible] = useState(false)
 
@@ -37,6 +39,18 @@ function App(): React.JSX.Element {
         setErrorMessage(error instanceof Error ? error.message : 'Unable to load saved text.')
       })
       .finally(() => setIsLoading(false))
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = window.api.onUpdateState(setUpdateState)
+    window.api
+      .getUpdateState()
+      .then(setUpdateState)
+      .catch((error: unknown) => {
+        console.error('Unable to get update state:', error)
+      })
+
+    return unsubscribe
   }, [])
 
   useLayoutEffect(() => {
@@ -119,6 +133,14 @@ function App(): React.JSX.Element {
     }
   }
 
+  const handleDownloadUpdate = async (): Promise<void> => {
+    try {
+      await window.api.downloadUpdate()
+    } catch (error) {
+      console.error('Unable to start update download:', error)
+    }
+  }
+
   const handleSavedListTransitionEnd = (event: React.TransitionEvent<HTMLElement>): void => {
     if (
       event.target === event.currentTarget &&
@@ -133,6 +155,36 @@ function App(): React.JSX.Element {
     <main
       className={`app-screen${hasSavedInputs || hasSavedListContent ? ' app-screen--populated' : ''}`}
     >
+      {updateState && (
+        <aside className="update-notice" aria-live="polite">
+          {updateState.status === 'available' && (
+            <>
+              {updateState.error && (
+                <p className="error-message" role="alert">
+                  {updateState.error}
+                </p>
+              )}
+              <button
+                className="submit-button update-button"
+                type="button"
+                onClick={() => void handleDownloadUpdate()}
+              >
+                Télécharger la mise à jour {updateState.version}
+              </button>
+            </>
+          )}
+          {updateState.status === 'downloading' && (
+            <p className="update-status">
+              Téléchargement de la mise à jour : {Math.floor(updateState.percent)} %
+            </p>
+          )}
+          {updateState.status === 'downloaded' && (
+            <p className="update-status">
+              Mise à jour prête. Elle sera installée au redémarrage ou à la fermeture.
+            </p>
+          )}
+        </aside>
+      )}
       <section
         ref={inputPanelRef}
         className={`input-panel${hasSavedInputs ? ' input-panel--populated' : ''}`}

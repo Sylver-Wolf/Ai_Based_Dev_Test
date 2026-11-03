@@ -1,10 +1,82 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
+import type { UpdateState } from '../shared/update'
 import icon from '../../resources/icon.png?asset'
 
 const savedInputsPath = (): string => join(app.getPath('userData'), 'saved-inputs.json')
+let updateState: UpdateState | null = null
+
+function setUpdateState(state: UpdateState | null): void {
+  updateState = state
+  for (const window of BrowserWindow.getAllWindows()) {
+    window.webContents.send('updates:state-changed', state)
+  }
+}
+
+async function promptToInstallUpdate(version: string): Promise<void> {
+  try {
+    const { response } = await dialog.showMessageBox({
+      type: 'info',
+      title: 'Mise à jour prête',
+      message: `La version ${version} a été téléchargée.`,
+      detail:
+        'Souhaitez-vous redémarrer maintenant ? Sinon, la mise à jour sera installée à la fermeture de l’application.',
+      buttons: ['Redémarrer maintenant', 'Plus tard'],
+      defaultId: 0,
+      cancelId: 1,
+      noLink: true
+    })
+
+    if (response === 0) {
+      autoUpdater.quitAndInstall(false, true)
+    }
+  } catch (error) {
+    console.error('Unable to prompt to install the downloaded update:', error)
+  }
+}
+
+function checkForUpdates(): void {
+  if (is.dev || process.platform !== 'win32') return
+
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = false
+  autoUpdater.on('update-available', (info) => {
+    setUpdateState({ status: 'available', version: info.version })
+  })
+  autoUpdater.on('update-not-available', () => {
+    setUpdateState(null)
+  })
+  autoUpdater.on('download-progress', (progress) => {
+    if (updateState?.status === 'downloading') {
+      setUpdateState({
+        ...updateState,
+        percent: progress.percent
+      })
+    }
+  })
+  autoUpdater.on('update-downloaded', (event) => {
+    autoUpdater.autoInstallOnAppQuit = true
+    setUpdateState({ status: 'downloaded', version: event.version })
+    void promptToInstallUpdate(event.version)
+  })
+  autoUpdater.on('error', (error) => {
+    console.error('Automatic update error:', error)
+    if (updateState?.status === 'downloading') {
+      setUpdateState({
+        status: 'available',
+        version: updateState.version,
+        error: 'Le téléchargement a échoué. Vous pouvez réessayer.'
+      })
+    }
+  })
+
+  void autoUpdater.checkForUpdates().catch((error: unknown) => {
+    console.error('Unable to check for updates:', error)
+  })
+}
 
 async function loadSavedInputs(): Promise<string[]> {
   let contents: string
@@ -102,8 +174,29 @@ app.whenReady().then(() => {
   ipcMain.handle('saved-inputs:load', () => loadSavedInputs())
   ipcMain.handle('saved-inputs:save', (_event, input: unknown) => saveInput(input))
   ipcMain.handle('saved-inputs:delete', (_event, index: unknown) => deleteSavedInput(index))
+  ipcMain.handle('updates:get-state', () => updateState)
+  ipcMain.handle('updates:download', async () => {
+    if (updateState?.status !== 'available') {
+      throw new Error('No update is available to download.')
+    }
+
+    const { version } = updateState
+    setUpdateState({ status: 'downloading', version, percent: 0 })
+    try {
+      await autoUpdater.downloadUpdate()
+    } catch (error) {
+      console.error('Unable to download the update:', error)
+      setUpdateState({
+        status: 'available',
+        version,
+        error: 'Le téléchargement a échoué. Vous pouvez réessayer.'
+      })
+      throw error
+    }
+  })
 
   createWindow()
+  checkForUpdates()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
