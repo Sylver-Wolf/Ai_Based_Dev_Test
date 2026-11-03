@@ -17,7 +17,10 @@ it('mounts the application into the root element and completes its initial load'
   window.api = {
     loadSavedInputs: vi.fn().mockResolvedValue([]),
     saveInput: vi.fn().mockResolvedValue([]),
-    deleteSavedInput: vi.fn().mockResolvedValue([])
+    deleteSavedInput: vi.fn().mockResolvedValue([]),
+    getUpdateState: vi.fn().mockResolvedValue(null),
+    downloadUpdate: vi.fn().mockResolvedValue(undefined),
+    onUpdateState: vi.fn().mockReturnValue(() => {})
   }
 
   vi.doMock('react-dom/client', async () => {

@@ -12,6 +12,32 @@ body {
   width: 100%;
 }
 
+.update-notice {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+
+.update-button {
+  min-height: 36px;
+}
+
+.update-status {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+}
+
 .app-screen--populated {
   display: grid;
   grid-template-rows: minmax(104px, auto) minmax(0, 1fr);

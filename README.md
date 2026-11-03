@@ -35,6 +35,19 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
+### Mises à jour automatiques (Windows)
+
+Les versions Windows installées vérifient les releases GitHub au démarrage et
+téléchargent les mises à jour en arrière-plan. Lorsque le téléchargement est
+terminé, l’application propose de redémarrer pour installer la nouvelle version ;
+choisir « Plus tard » laisse l’application continuer sans installer la mise à jour.
+
+Pour publier une mise à jour, augmentez `version` dans `package.json`, puis créez
+et poussez le tag correspondant (`vX.Y.Z`). Le workflow Windows publie alors
+l’installateur et les métadonnées nécessaires sur la release GitHub. Les releases
+doivent être accessibles à l’application installée. Les mises à jour automatiques
+sont désactivées en développement et ne sont configurées ici que pour Windows.
+
 ### Tests
 
 ```bash

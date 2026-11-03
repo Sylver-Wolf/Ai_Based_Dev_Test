@@ -1,11 +1,17 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { UpdateState } from '../../shared/update'
 import App from './App'
+
+let updateStateListener: ((state: UpdateState | null) => void) | undefined
 
 const api = {
   loadSavedInputs: vi.fn<() => Promise<string[]>>(),
   saveInput: vi.fn<(input: string) => Promise<string[]>>(),
-  deleteSavedInput: vi.fn<(index: number) => Promise<string[]>>()
+  deleteSavedInput: vi.fn<(index: number) => Promise<string[]>>(),
+  getUpdateState: vi.fn<() => Promise<UpdateState | null>>(),
+  downloadUpdate: vi.fn<() => Promise<void>>(),
+  onUpdateState: vi.fn<(callback: (state: UpdateState | null) => void) => () => void>()
 }
 
 const originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia')
@@ -59,6 +65,14 @@ describe('App', () => {
     api.loadSavedInputs.mockResolvedValue([])
     api.saveInput.mockResolvedValue([])
     api.deleteSavedInput.mockResolvedValue([])
+    api.getUpdateState.mockResolvedValue(null)
+    api.downloadUpdate.mockResolvedValue()
+    api.onUpdateState.mockImplementation((callback) => {
+      updateStateListener = callback
+      return () => {
+        updateStateListener = undefined
+      }
+    })
 
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -115,6 +129,23 @@ describe('App', () => {
 
     expect(container.querySelector('.saved-inputs-content')).toBeNull()
     expect(container.querySelector('.saved-inputs')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('only shows the update button after an update is detected and starts downloading on click', async () => {
+    await renderLoaded([])
+
+    expect(screen.queryByRole('button', { name: /Télécharger la mise à jour/ })).toBeNull()
+    updateStateListener?.({ status: 'available', version: '1.2.3' })
+
+    const updateButton = await screen.findByRole('button', {
+      name: 'Télécharger la mise à jour 1.2.3'
+    })
+    fireEvent.click(updateButton)
+    expect(api.downloadUpdate).toHaveBeenCalledOnce()
+
+    updateStateListener?.({ status: 'downloading', version: '1.2.3', percent: 42 })
+    expect(await screen.findByText('Téléchargement de la mise à jour : 42 %')).not.toBeNull()
+    expect(screen.queryByRole('button', { name: /Télécharger la mise à jour/ })).toBeNull()
   })
 
   it.each([
