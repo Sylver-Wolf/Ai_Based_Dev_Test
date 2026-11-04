@@ -59,10 +59,33 @@ jobs:
       - name: Run tests and enforce coverage thresholds
         run: npm run test:coverage
 
-      - name: Build Windows installer
+      - name: Build application
         run: npm run build
 
-      - name: Publish installer to GitHub Release
-        run: npx electron-builder --win --publish always
+      - name: Package Windows installer and update metadata
+        run: npx electron-builder --win --publish never
+
+      - name: Publish installer and update metadata to GitHub Release
         env:
+          RELEASE_TAG: ${{ github.ref_name }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $packageVersion = node -p "require('./package.json').version"
+          $installer = "dist\Ai_Based_Dev_Test-$packageVersion-setup.exe"
+          $blockmap = "$installer.blockmap"
+          $updateMetadata = "dist\latest.yml"
+
+          foreach ($file in @($installer, $blockmap, $updateMetadata)) {
+            if (-not (Test-Path $file)) {
+              throw "Expected release asset '$file' was not generated."
+            }
+          }
+
+          gh release create $env:RELEASE_TAG `
+            $installer `
+            $blockmap `
+            $updateMetadata `
+            --verify-tag `
+            --title $env:RELEASE_TAG `
+            --generate-notes
