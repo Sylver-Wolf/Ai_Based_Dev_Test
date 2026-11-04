@@ -239,7 +239,7 @@ body {
 
 .saved-input-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   width: 100%;
 }
@@ -254,6 +254,7 @@ body {
   background-color: var(--color-background-soft);
   color: var(--ev-c-text-1);
   font-size: 14px;
+  user-select: text;
 }
 
 .delete-input-button {
