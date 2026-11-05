@@ -3,8 +3,8 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/renderer/src/test/setup.ts'],
-    include: ['src/renderer/src/**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ['./src/renderer/tests/setup.ts'],
+    include: ['src/renderer/tests/**/*.{test,spec}.{ts,tsx}'],
     clearMocks: true,
     restoreMocks: true,
     coverage: {
@@ -14,7 +14,7 @@ export default defineConfig({
       exclude: [
         'src/renderer/src/**/*.d.ts',
         'src/renderer/src/**/*.{test,spec}.{ts,tsx}',
-        'src/renderer/src/test/**'
+        'src/renderer/tests/**'
       ],
       thresholds: {
         statements: 80,

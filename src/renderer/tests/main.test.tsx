@@ -36,7 +36,7 @@ it('mounts the application into the root element and completes its initial load'
     }
   })
 
-  await import('./main')
+  await import('../src/main')
 
   const input = await screen.findByRole<HTMLInputElement>('textbox', { name: 'Enter text' })
   await waitFor(() => expect(input.disabled).toBe(false))
