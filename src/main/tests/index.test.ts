@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { join } from 'path'
 
 type IPCHandler = (...args: unknown[]) => unknown
 type EventHandler = (...args: unknown[]) => void
@@ -204,7 +205,7 @@ describe('main process IPC', () => {
 
     expect(await invoke('saved-inputs:save', 'added')).toEqual(['existing', 'added'])
     expect(mocks.writeFile).toHaveBeenCalledWith(
-      'C:\\mock-user-data\\saved-inputs.json',
+      join(mocks.userDataPath, 'saved-inputs.json'),
       '[\n  "existing",\n  "added"\n]\n',
       'utf8'
     )
@@ -220,7 +221,7 @@ describe('main process IPC', () => {
 
     expect(await invoke('saved-inputs:delete', 0)).toEqual(['second'])
     expect(mocks.writeFile).toHaveBeenCalledWith(
-      'C:\\mock-user-data\\saved-inputs.json',
+      join(mocks.userDataPath, 'saved-inputs.json'),
       '[\n  "second"\n]\n',
       'utf8'
     )
