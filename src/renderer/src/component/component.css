@@ -1,0 +1,270 @@
+.update-notice {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+
+.update-button {
+  min-height: 36px;
+}
+
+.update-status {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+}
+
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  width: min(100% - 32px, 360px);
+  z-index: 1;
+}
+
+.input-panel--populated {
+  align-items: flex-start;
+  position: relative;
+  top: auto;
+  left: auto;
+  margin: 16px;
+  max-height: none;
+  overflow: visible;
+  transform: none;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.saved-inputs {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  width: min(400px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 350ms ease,
+    visibility 0s linear 350ms;
+  z-index: 0;
+}
+
+.saved-inputs-list {
+  scrollbar-color: var(--ev-c-gray-1) var(--color-background-soft);
+  scrollbar-width: thin;
+}
+
+.saved-inputs-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.saved-inputs-list::-webkit-scrollbar-track {
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+}
+
+.saved-inputs-list::-webkit-scrollbar-thumb {
+  border: 2px solid var(--color-background-soft);
+  border-radius: 6px;
+  background-color: var(--ev-c-gray-1);
+}
+
+.saved-inputs-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ev-c-gray-2);
+}
+
+.app-screen--populated .saved-inputs {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  grid-row: 2;
+  height: 100%;
+  justify-self: center;
+  max-height: none;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  width: min(400px, calc(100vw - 32px));
+}
+
+.saved-inputs--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.saved-inputs-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  margin-top: 16px;
+  padding-right: 8px;
+  width: 100%;
+}
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+  width: min(360px, 100%);
+}
+
+.input-label {
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-input {
+  min-width: 0;
+  flex: 1;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-1);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  font-size: 14px;
+  outline: none;
+}
+
+.input-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.user-input:focus {
+  border-color: #6988e6;
+  box-shadow: 0 0 0 2px #6988e644;
+}
+
+.submit-button {
+  padding: 0 14px;
+  border: 1px solid var(--ev-button-alt-border);
+  border-radius: 6px;
+  background-color: var(--ev-button-alt-bg);
+  color: var(--ev-button-alt-text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--ev-button-alt-hover-bg);
+  color: var(--ev-button-alt-hover-text);
+}
+
+.submit-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error-message {
+  margin-top: 12px;
+  color: #ff8a8a;
+  font-size: 14px;
+}
+
+.saved-inputs-heading {
+  margin-bottom: 8px;
+  color: var(--ev-c-text-1);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.saved-inputs-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.saved-input-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.saved-input-item {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  padding: 10px 12px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-1);
+  font-size: 14px;
+  user-select: text;
+}
+
+.delete-input-button {
+  align-items: center;
+  display: flex;
+  flex: 0 0 32px;
+  height: 32px;
+  justify-content: center;
+  padding: 7px;
+  border: 1px solid var(--ev-c-gray-3);
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--ev-c-text-2);
+  cursor: pointer;
+}
+
+.delete-input-button:hover:not(:disabled) {
+  border-color: #ff8a8a;
+  background-color: #ff8a8a1a;
+  color: #ff8a8a;
+}
+
+.delete-input-button:focus-visible {
+  outline: 2px solid #6988e6;
+  outline-offset: 2px;
+}
+
+.delete-input-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.trash-icon {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saved-inputs {
+    transition: none;
+  }
+}
