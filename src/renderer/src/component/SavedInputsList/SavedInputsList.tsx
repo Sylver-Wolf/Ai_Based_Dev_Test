@@ -1,3 +1,5 @@
+import './SavedInputsList.css'
+
 import type { TransitionEventHandler } from 'react'
 
 type SavedInputsListProps = {

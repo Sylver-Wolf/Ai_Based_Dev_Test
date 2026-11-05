@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { UpdateState } from '../../shared/update'
-import InputPanel from './component/InputPanel'
-import SavedInputsList from './component/SavedInputsList'
-import UpdateNotice from './component/UpdateNotice'
+import InputPanel from './component/InputPanel/InputPanel'
+import SavedInputsList from './component/SavedInputsList/SavedInputsList'
+import UpdateNotice from './component/UpdateNotice/UpdateNotice'
 import { useSavedInputs } from './component/useSavedInputs'
 
 function App(): React.JSX.Element {

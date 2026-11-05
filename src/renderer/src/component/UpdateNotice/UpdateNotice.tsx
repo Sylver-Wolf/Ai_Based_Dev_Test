@@ -1,4 +1,6 @@
-import type { UpdateState } from '../../../shared/update'
+import './UpdateNotice.css'
+
+import type { UpdateState } from '../../../../shared/update'
 
 type UpdateNoticeProps = {
   updateState: UpdateState | null

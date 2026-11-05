@@ -1,3 +1,5 @@
+import './InputPanel.css'
+
 import type { FormEventHandler, Ref, RefObject, Dispatch, SetStateAction } from 'react'
 
 type InputPanelProps = {
