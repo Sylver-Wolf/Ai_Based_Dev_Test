@@ -32,9 +32,9 @@ function SavedInputsList({
           <ul className="saved-inputs-list">
             {displayedInputs.map((savedInput, index) => (
               <li className="saved-input-row" key={`${index}-${savedInput}`}>
-                <span className="saved-input-item">{savedInput}</span>
+                <span className="surface saved-input-item">{savedInput}</span>
                 <button
-                  className="delete-input-button"
+                  className="button delete-input-button"
                   type="button"
                   aria-label={`Delete saved text ${index + 1}`}
                   title="Delete saved text"

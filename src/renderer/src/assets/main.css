@@ -18,30 +18,3 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-
-.submit-button {
-  padding: 0 14px;
-  border: 1px solid var(--ev-button-alt-border);
-  border-radius: 6px;
-  background-color: var(--ev-button-alt-bg);
-  color: var(--ev-button-alt-text);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.submit-button:hover:not(:disabled) {
-  background-color: var(--ev-button-alt-hover-bg);
-  color: var(--ev-button-alt-hover-text);
-}
-
-.submit-button:disabled {
-  cursor: wait;
-  opacity: 0.7;
-}
-
-.error-message {
-  margin-top: 12px;
-  color: #ff8a8a;
-  font-size: 14px;
-}

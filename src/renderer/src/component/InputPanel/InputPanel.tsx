@@ -46,7 +46,7 @@ function InputPanel({
             disabled={isDisabled}
             required
           />
-          <button className="submit-button" type="submit" disabled={isDisabled}>
+          <button className="button" type="submit" disabled={isDisabled}>
             {isSaving ? 'Saving...' : 'Submit'}
           </button>
         </div>

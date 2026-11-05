@@ -17,7 +17,7 @@
 }
 
 .saved-inputs-list {
-  scrollbar-color: var(--ev-c-gray-1) var(--color-background-soft);
+  scrollbar-color: var(--color-gray-light) var(--color-surface-background);
   scrollbar-width: thin;
 }
 
@@ -27,17 +27,17 @@
 
 .saved-inputs-list::-webkit-scrollbar-track {
   border-radius: 6px;
-  background-color: var(--color-background-soft);
+  background-color: var(--color-surface-background);
 }
 
 .saved-inputs-list::-webkit-scrollbar-thumb {
-  border: 2px solid var(--color-background-soft);
+  border: 2px solid var(--color-surface-background);
   border-radius: 6px;
-  background-color: var(--ev-c-gray-1);
+  background-color: var(--color-gray-light);
 }
 
 .saved-inputs-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--ev-c-gray-2);
+  background-color: var(--color-gray-medium);
 }
 
 .app-screen--populated .saved-inputs {
@@ -77,7 +77,7 @@
 
 .saved-inputs-heading {
   margin-bottom: 8px;
-  color: var(--ev-c-text-1);
+  color: var(--color-text-primary);
   font-size: 18px;
   font-weight: 600;
 }
@@ -103,12 +103,6 @@
   min-width: 0;
   flex: 1;
   overflow-wrap: anywhere;
-  padding: 10px 12px;
-  border: 1px solid var(--ev-c-gray-3);
-  border-radius: 6px;
-  background-color: var(--color-background-soft);
-  color: var(--ev-c-text-1);
-  font-size: 14px;
   user-select: text;
 }
 
@@ -119,26 +113,18 @@
   height: 32px;
   justify-content: center;
   padding: 7px;
-  border: 1px solid var(--ev-c-gray-3);
-  border-radius: 6px;
-  background-color: var(--color-background-soft);
-  color: var(--ev-c-text-2);
-  cursor: pointer;
+  border: 1px solid var(--color-gray-dark);
+  background-color: var(--color-surface-background);
+  color: var(--color-text-secondary);
 }
 
 .delete-input-button:hover:not(:disabled) {
-  border-color: #ff8a8a;
+  border-color: var(--color-error);
   background-color: #ff8a8a1a;
-  color: #ff8a8a;
-}
-
-.delete-input-button:focus-visible {
-  outline: 2px solid #6988e6;
-  outline-offset: 2px;
+  color: var(--color-error);
 }
 
 .delete-input-button:disabled {
-  cursor: wait;
   opacity: 0.6;
 }
 
