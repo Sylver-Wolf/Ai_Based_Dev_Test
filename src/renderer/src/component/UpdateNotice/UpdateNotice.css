@@ -1,0 +1,19 @@
+.update-notice {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+
+.update-button {
+  min-height: 36px;
+}
+
+.update-status {
+  margin: 0;
+}

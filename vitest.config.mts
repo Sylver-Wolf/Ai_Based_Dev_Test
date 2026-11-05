@@ -3,18 +3,31 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/renderer/src/test/setup.ts'],
-    include: ['src/renderer/src/**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ['./src/renderer/tests/setup.ts'],
+    include: [
+      'src/renderer/tests/**/*.{test,spec}.{ts,tsx}',
+      'src/main/tests/**/*.{test,spec}.{ts,tsx}',
+      'src/preload/tests/**/*.{test,spec}.{ts,tsx}'
+    ],
     clearMocks: true,
     restoreMocks: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/renderer/src/**/*.{ts,tsx}'],
+      include: [
+        'src/renderer/src/**/*.{ts,tsx}',
+        'src/main/**/*.{ts,tsx}',
+        'src/preload/**/*.{ts,tsx}'
+      ],
       exclude: [
         'src/renderer/src/**/*.d.ts',
         'src/renderer/src/**/*.{test,spec}.{ts,tsx}',
-        'src/renderer/src/test/**'
+        'src/renderer/tests/**',
+        'src/main/**/*.{test,spec}.{ts,tsx}',
+        'src/main/tests/**',
+        'src/preload/**/*.d.ts',
+        'src/preload/**/*.{test,spec}.{ts,tsx}',
+        'src/preload/tests/**'
       ],
       thresholds: {
         statements: 80,
