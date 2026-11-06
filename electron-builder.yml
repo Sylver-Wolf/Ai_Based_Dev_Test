@@ -14,10 +14,14 @@ asarUnpack:
 win:
   executableName: Ai_Based_Dev_Test
 nsis:
+  oneClick: false
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  installerHeader: build/installerHeader.bmp
+  installerSidebar: build/installerSidebar.bmp
+  include: build/installer.nsh
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
