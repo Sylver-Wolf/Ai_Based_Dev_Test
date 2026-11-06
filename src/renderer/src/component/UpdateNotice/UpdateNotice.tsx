@@ -20,18 +20,18 @@ function UpdateNotice({ updateState, onDownload }: UpdateNoticeProps): React.JSX
             </p>
           )}
           <button className="button update-button" type="button" onClick={onDownload}>
-            Télécharger la mise à jour {updateState.version}
+            Download update {updateState.version}
           </button>
         </>
       )}
       {updateState.status === 'downloading' && (
         <p className="surface update-status">
-          Téléchargement de la mise à jour : {Math.floor(updateState.percent)} %
+          Downloading update: {Math.floor(updateState.percent)}%
         </p>
       )}
       {updateState.status === 'downloaded' && (
         <p className="surface update-status">
-          Mise à jour prête. Elle sera installée au redémarrage ou à la fermeture.
+          Update ready. It will be installed when you restart or close the application.
         </p>
       )}
     </aside>

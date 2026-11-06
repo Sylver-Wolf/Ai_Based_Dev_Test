@@ -18,7 +18,7 @@ describe('UpdateNotice', () => {
     )
 
     expect(screen.getByRole('alert').textContent).toContain('Download failed')
-    fireEvent.click(screen.getByRole('button', { name: 'Télécharger la mise à jour 1.2.3' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Download update 1.2.3' }))
     expect(onDownload).toHaveBeenCalledOnce()
   })
 
@@ -30,7 +30,7 @@ describe('UpdateNotice', () => {
       />
     )
 
-    expect(screen.getByText('Téléchargement de la mise à jour : 42 %')).not.toBeNull()
+    expect(screen.getByText('Downloading update: 42%')).not.toBeNull()
   })
 
   it('shows when the update is ready to install', () => {
@@ -39,7 +39,9 @@ describe('UpdateNotice', () => {
     )
 
     expect(
-      screen.getByText('Mise à jour prête. Elle sera installée au redémarrage ou à la fermeture.')
+      screen.getByText(
+        'Update ready. It will be installed when you restart or close the application.'
+      )
     ).not.toBeNull()
   })
 })

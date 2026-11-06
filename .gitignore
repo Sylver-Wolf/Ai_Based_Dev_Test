@@ -2,6 +2,7 @@ node_modules
 dist
 out
 coverage
+/test-data
 .DS_Store
 .eslintcache
 *.log*

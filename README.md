@@ -22,6 +22,12 @@ $ npm ci
 $ npm run dev
 ```
 
+In development, saved text is stored in `test-data/saved-inputs.json` at the
+project root. The installed application continues to use its own user data
+directory. The development Electron profile (Chromium cache, local storage, etc.)
+is also isolated in a separate user data directory with a `-dev` suffix, so both
+versions can run at the same time, without polluting eachother.
+
 ### Build
 
 ```bash
@@ -35,18 +41,18 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-### Mises à jour automatiques (Windows)
+### Automatic updates (Windows)
 
-Les versions Windows installées vérifient les releases GitHub au démarrage et
-téléchargent les mises à jour en arrière-plan. Lorsque le téléchargement est
-terminé, l’application propose de redémarrer pour installer la nouvelle version ;
-choisir « Plus tard » laisse l’application continuer sans installer la mise à jour.
+Installed Windows versions check GitHub releases at startup and download updates
+in the background. Once a download is complete, the application asks whether to
+restart and install the new version. Choosing "Later" keeps the application
+running without installing the update.
 
-Pour publier une mise à jour, augmentez `version` dans `package.json`, puis créez
-et poussez le tag correspondant (`vX.Y.Z`). Le workflow Windows publie alors
-l’installateur et les métadonnées nécessaires sur la release GitHub. Les releases
-doivent être accessibles à l’application installée. Les mises à jour automatiques
-sont désactivées en développement et ne sont configurées ici que pour Windows.
+To publish an update, increment `version` in `package.json`, then create and push
+the corresponding tag (`vX.Y.Z`). The Windows workflow publishes the installer
+and required metadata to the GitHub release. Releases must be accessible to the
+installed application. Automatic updates are disabled in development and are
+currently configured for Windows only.
 
 ### Tests
 

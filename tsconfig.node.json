@@ -4,7 +4,8 @@
     "electron.vite.config.*",
     "vitest.config.mts",
     "src/main/**/*",
-    "src/preload/**/*"
+    "src/preload/**/*",
+    "src/shared/**/*"
   ],
   "compilerOptions": {
     "composite": true,
