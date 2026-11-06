@@ -1,12 +1,20 @@
 import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import type { UpdateState } from '../shared/update'
 import icon from '../../resources/icon.png?asset'
 
-const savedInputsPath = (): string => join(app.getPath('userData'), 'saved-inputs.json')
+const savedInputsPath = (): string =>
+  is.dev
+    ? join(app.getAppPath(), 'test-data', 'saved-inputs.json')
+    : join(app.getPath('userData'), 'saved-inputs.json')
+
+if (is.dev) {
+  app.setPath('userData', join(app.getPath('appData'), `${app.getName()}-dev`))
+}
+
 let updateState: UpdateState | null = null
 
 function setUpdateState(state: UpdateState | null): void {
@@ -20,11 +28,11 @@ async function promptToInstallUpdate(version: string): Promise<void> {
   try {
     const { response } = await dialog.showMessageBox({
       type: 'info',
-      title: 'Mise à jour prête',
-      message: `La version ${version} a été téléchargée.`,
+      title: 'Update ready',
+      message: `Version ${version} has been downloaded.`,
       detail:
-        'Souhaitez-vous redémarrer maintenant ? Sinon, la mise à jour sera installée à la fermeture de l’application.',
-      buttons: ['Redémarrer maintenant', 'Plus tard'],
+        'Would you like to restart now? Otherwise, the update will be installed when you close the application.',
+      buttons: ['Restart now', 'Later'],
       defaultId: 0,
       cancelId: 1,
       noLink: true
@@ -68,7 +76,7 @@ function checkForUpdates(): void {
       setUpdateState({
         status: 'available',
         version: updateState.version,
-        error: 'Le téléchargement a échoué. Vous pouvez réessayer.'
+        error: 'The download failed. You can try again.'
       })
     }
   })
@@ -104,7 +112,9 @@ async function saveInput(input: unknown): Promise<string[]> {
 
   const savedInputs = await loadSavedInputs()
   savedInputs.push(input)
-  await writeFile(savedInputsPath(), `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
+  const filePath = savedInputsPath()
+  await mkdir(dirname(filePath), { recursive: true })
+  await writeFile(filePath, `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
   return savedInputs
 }
 
@@ -119,7 +129,9 @@ async function deleteSavedInput(index: unknown): Promise<string[]> {
   }
 
   savedInputs.splice(index, 1)
-  await writeFile(savedInputsPath(), `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
+  const filePath = savedInputsPath()
+  await mkdir(dirname(filePath), { recursive: true })
+  await writeFile(filePath, `${JSON.stringify(savedInputs, null, 2)}\n`, 'utf8')
   return savedInputs
 }
 
@@ -189,7 +201,7 @@ app.whenReady().then(() => {
       setUpdateState({
         status: 'available',
         version,
-        error: 'Le téléchargement a échoué. Vous pouvez réessayer.'
+        error: 'The download failed. You can try again.'
       })
       throw error
     }

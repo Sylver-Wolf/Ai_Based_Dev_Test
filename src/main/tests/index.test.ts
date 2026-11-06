@@ -22,13 +22,19 @@ const mocks = vi.hoisted(() => ({
   }>,
   windowOpenHandler: undefined as ((details: { url: string }) => unknown) | undefined,
   userDataPath: 'C:\\mock-user-data',
+  appDataPath: 'C:\\mock-app-data',
+  appPath: 'C:\\mock-project',
+  appName: 'Ai_Based_Dev_Test',
+  isDev: false,
   appWhenReady: vi.fn(),
   appOn: vi.fn(),
+  appSetPath: vi.fn(),
   appQuit: vi.fn(),
   setAppUserModelId: vi.fn(),
   watchWindowShortcuts: vi.fn(),
   ipcOn: vi.fn(),
   readFile: vi.fn(),
+  mkdir: vi.fn(),
   writeFile: vi.fn(),
   checkForUpdates: vi.fn(),
   downloadUpdate: vi.fn(),
@@ -67,7 +73,12 @@ vi.mock('electron', () => {
 
   return {
     app: {
-      getPath: vi.fn(() => mocks.userDataPath),
+      getPath: vi.fn((name: string) =>
+        name === 'appData' ? mocks.appDataPath : mocks.userDataPath
+      ),
+      getName: vi.fn(() => mocks.appName),
+      setPath: mocks.appSetPath,
+      getAppPath: vi.fn(() => mocks.appPath),
       whenReady: mocks.appWhenReady,
       on: mocks.appOn,
       quit: mocks.appQuit
@@ -85,6 +96,7 @@ vi.mock('electron', () => {
 })
 
 vi.mock('fs/promises', () => ({
+  mkdir: mocks.mkdir,
   readFile: mocks.readFile,
   writeFile: mocks.writeFile
 }))
@@ -92,7 +104,11 @@ vi.mock('fs/promises', () => ({
 vi.mock('@electron-toolkit/utils', () => ({
   electronApp: { setAppUserModelId: mocks.setAppUserModelId },
   optimizer: { watchWindowShortcuts: mocks.watchWindowShortcuts },
-  is: { dev: false }
+  is: {
+    get dev() {
+      return mocks.isDev
+    }
+  }
 }))
 
 vi.mock('electron-updater', () => ({
@@ -118,6 +134,10 @@ describe('main process IPC', () => {
     mocks.windows.splice(0)
     mocks.windowOpenHandler = undefined
     mocks.userDataPath = 'C:\\mock-user-data'
+    mocks.appDataPath = 'C:\\mock-app-data'
+    mocks.appPath = 'C:\\mock-project'
+    mocks.appName = 'Ai_Based_Dev_Test'
+    mocks.isDev = false
     mocks.appWhenReady.mockResolvedValue(undefined)
     mocks.appOn.mockImplementation((event: string, listener: EventHandler) => {
       mocks.appListeners.set(event, listener)
@@ -126,6 +146,7 @@ describe('main process IPC', () => {
       mocks.updaterListeners.set(event, listener)
     })
     mocks.readFile.mockRejectedValue(Object.assign(new Error('missing'), { code: 'ENOENT' }))
+    mocks.mkdir.mockResolvedValue(undefined)
     mocks.writeFile.mockResolvedValue(undefined)
     mocks.checkForUpdates.mockResolvedValue(undefined)
     mocks.downloadUpdate.mockResolvedValue(undefined)
@@ -165,6 +186,7 @@ describe('main process IPC', () => {
   it('initializes the app window and opens external links outside Electron', async () => {
     await startMain()
 
+    expect(mocks.appSetPath).not.toHaveBeenCalled()
     expect(mocks.setAppUserModelId).toHaveBeenCalledWith('com.electron')
     expect(mocks.windows).toHaveLength(1)
     expect(mocks.windows[0].loadFile).toHaveBeenCalledOnce()
@@ -209,10 +231,38 @@ describe('main process IPC', () => {
       '[\n  "existing",\n  "added"\n]\n',
       'utf8'
     )
+    expect(mocks.mkdir).toHaveBeenCalledWith(mocks.userDataPath, { recursive: true })
 
     await expect(invoke('saved-inputs:save', 42)).rejects.toThrow('Input must be text.')
     mocks.writeFile.mockRejectedValueOnce(new Error('disk full'))
     await expect(invoke('saved-inputs:save', 'new')).rejects.toThrow('disk full')
+  })
+
+  it('stores development inputs in the project test-data folder', async () => {
+    mocks.isDev = true
+    await startMain()
+    expect(mocks.appSetPath).toHaveBeenCalledWith(
+      'userData',
+      join(mocks.appDataPath, `${mocks.appName}-dev`)
+    )
+    expect(mocks.appSetPath.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.appWhenReady.mock.invocationCallOrder[0]
+    )
+    mocks.readFile.mockResolvedValueOnce('[]')
+
+    expect(await invoke('saved-inputs:save', 'test input')).toEqual(['test input'])
+    expect(mocks.readFile).toHaveBeenCalledWith(
+      join(mocks.appPath, 'test-data', 'saved-inputs.json'),
+      'utf8'
+    )
+    expect(mocks.mkdir).toHaveBeenCalledWith(join(mocks.appPath, 'test-data'), {
+      recursive: true
+    })
+    expect(mocks.writeFile).toHaveBeenCalledWith(
+      join(mocks.appPath, 'test-data', 'saved-inputs.json'),
+      '[\n  "test input"\n]\n',
+      'utf8'
+    )
   })
 
   it('deletes only an existing integer index and persists the remaining items', async () => {
@@ -276,7 +326,7 @@ describe('main process IPC', () => {
     expect(await invoke('updates:get-state')).toEqual({
       status: 'available',
       version: '2.1.0',
-      error: 'Le téléchargement a échoué. Vous pouvez réessayer.'
+      error: 'The download failed. You can try again.'
     })
     expect(consoleError).toHaveBeenCalledTimes(3)
 

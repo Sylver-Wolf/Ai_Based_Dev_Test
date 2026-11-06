@@ -110,7 +110,7 @@ describe('App', () => {
     const { unmount } = await renderLoaded([])
 
     const updateButton = await screen.findByRole('button', {
-      name: 'Télécharger la mise à jour 1.2.3'
+      name: 'Download update 1.2.3'
     })
     fireEvent.click(updateButton)
     updateStateListener?.({ status: 'downloading', version: '1.2.3', percent: 42 })
@@ -118,7 +118,7 @@ describe('App', () => {
     expect(api.onUpdateState).toHaveBeenCalledOnce()
     expect(api.getUpdateState).toHaveBeenCalledOnce()
     expect(api.downloadUpdate).toHaveBeenCalledOnce()
-    expect(await screen.findByText('Téléchargement de la mise à jour : 42 %')).not.toBeNull()
+    expect(await screen.findByText('Downloading update: 42%')).not.toBeNull()
 
     unmount()
     expect(unsubscribe).toHaveBeenCalledOnce()
