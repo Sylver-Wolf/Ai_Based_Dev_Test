@@ -11,11 +11,14 @@ const savedInputsPath = (): string =>
     ? join(app.getAppPath(), 'test-data', 'saved-inputs.json')
     : join(app.getPath('userData'), 'saved-inputs.json')
 
+const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000
+
 if (is.dev) {
   app.setPath('userData', join(app.getPath('appData'), `${app.getName()}-dev`))
 }
 
 let updateState: UpdateState | null = null
+let updateCheckInProgress = false
 
 function setUpdateState(state: UpdateState | null): void {
   updateState = state
@@ -24,11 +27,7 @@ function setUpdateState(state: UpdateState | null): void {
   }
 }
 
-function checkForUpdates(): void {
-  if (is.dev || process.platform !== 'win32') return
-
-  autoUpdater.autoDownload = false
-  autoUpdater.autoInstallOnAppQuit = false
+function setupUpdateListeners(): void {
   autoUpdater.on('update-available', (info) => {
     setUpdateState({ status: 'available', version: info.version })
   })
@@ -57,10 +56,36 @@ function checkForUpdates(): void {
       })
     }
   })
+}
 
-  void autoUpdater.checkForUpdates().catch((error: unknown) => {
-    console.error('Unable to check for updates:', error)
-  })
+function checkForUpdates(): void {
+  if (
+    updateCheckInProgress ||
+    updateState?.status === 'downloading' ||
+    updateState?.status === 'downloaded'
+  ) {
+    return
+  }
+
+  updateCheckInProgress = true
+  void autoUpdater
+    .checkForUpdates()
+    .catch((error: unknown) => {
+      console.error('Unable to check for updates:', error)
+    })
+    .finally(() => {
+      updateCheckInProgress = false
+    })
+}
+
+function startUpdateChecks(): void {
+  if (is.dev || process.platform !== 'win32') return
+
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = false
+  setupUpdateListeners()
+  checkForUpdates()
+  setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS).unref()
 }
 
 async function loadSavedInputs(): Promise<string[]> {
@@ -192,7 +217,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
-  checkForUpdates()
+  startUpdateChecks()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
