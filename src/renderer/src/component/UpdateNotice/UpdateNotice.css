@@ -18,13 +18,15 @@
 }
 
 .update-button {
-  background-color: var(--color-background-subtle);
+  border: 1px solid var(--color-gray-dark);
+  background-color: var(--color-surface-background);
   color: var(--color-text-secondary);
 }
 
 .update-button:hover:not(:disabled) {
-  background-color: var(--button-hover-background);
-  color: var(--button-hover-text);
+  border-color: var(--color-highlight-primary);
+  background-color: color-mix(in srgb, var(--color-highlight-primary) 10%, transparent);
+  color: var(--color-highlight-primary);
 }
 
 .update-progress {
