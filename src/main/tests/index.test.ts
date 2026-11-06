@@ -158,6 +158,7 @@ describe('main process IPC', () => {
     if (platformDescriptor) {
       Object.defineProperty(process, 'platform', platformDescriptor)
     }
+    vi.useRealTimers()
     vi.unstubAllEnvs()
     vi.resetModules()
   })
@@ -196,6 +197,19 @@ describe('main process IPC', () => {
 
     mocks.windowListeners.get('ready-to-show')?.()
     expect(mocks.windows[0].show).toHaveBeenCalledOnce()
+  })
+
+  it('checks for updates periodically without registering duplicate updater listeners', async () => {
+    vi.useFakeTimers()
+    await startMain()
+
+    expect(mocks.checkForUpdates).toHaveBeenCalledOnce()
+    expect(mocks.updaterListeners.size).toBe(5)
+
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000)
+
+    expect(mocks.checkForUpdates).toHaveBeenCalledTimes(2)
+    expect(mocks.updaterListeners.size).toBe(5)
   })
 
   it('loads missing storage as empty and validates stored JSON contents', async () => {
