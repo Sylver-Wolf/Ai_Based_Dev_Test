@@ -99,11 +99,23 @@ function App(): React.JSX.Element {
     }
   }
 
+  const handleRestartToInstall = async (): Promise<void> => {
+    try {
+      await window.api.installUpdate()
+    } catch (error) {
+      console.error('Unable to restart to install the update:', error)
+    }
+  }
+
   return (
     <main
       className={`app-screen${hasSavedInputs || hasSavedListContent ? ' app-screen--populated' : ''}`}
     >
-      <UpdateNotice updateState={updateState} onDownload={() => void handleDownloadUpdate()} />
+      <UpdateNotice
+        updateState={updateState}
+        onDownload={() => void handleDownloadUpdate()}
+        onRestart={() => void handleRestartToInstall()}
+      />
       <InputPanel
         panelRef={inputPanelRef}
         inputRef={inputRef}

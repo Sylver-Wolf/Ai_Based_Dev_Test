@@ -20,6 +20,7 @@ it('mounts the application into the root element and completes its initial load'
     deleteSavedInput: vi.fn().mockResolvedValue([]),
     getUpdateState: vi.fn().mockResolvedValue(null),
     downloadUpdate: vi.fn().mockResolvedValue(undefined),
+    installUpdate: vi.fn().mockResolvedValue(undefined),
     onUpdateState: vi.fn().mockReturnValue(() => {})
   }
 

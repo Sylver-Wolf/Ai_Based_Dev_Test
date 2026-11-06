@@ -4,7 +4,9 @@ import UpdateNotice from '../../../src/component/UpdateNotice/UpdateNotice'
 
 describe('UpdateNotice', () => {
   it('renders nothing when no update state is available', () => {
-    const { container } = render(<UpdateNotice updateState={null} onDownload={vi.fn()} />)
+    const { container } = render(
+      <UpdateNotice updateState={null} onDownload={vi.fn()} onRestart={vi.fn()} />
+    )
     expect(container.innerHTML).toBe('')
   })
 
@@ -14,6 +16,7 @@ describe('UpdateNotice', () => {
       <UpdateNotice
         updateState={{ status: 'available', version: '1.2.3', error: 'Download failed' }}
         onDownload={onDownload}
+        onRestart={vi.fn()}
       />
     )
 
@@ -27,21 +30,28 @@ describe('UpdateNotice', () => {
       <UpdateNotice
         updateState={{ status: 'downloading', version: '1.2.3', percent: 42.8 }}
         onDownload={vi.fn()}
+        onRestart={vi.fn()}
       />
     )
 
-    expect(screen.getByText('Downloading update: 42%')).not.toBeNull()
+    const progress = screen.getByRole('progressbar', { name: 'Downloading update' })
+    expect(progress.textContent).toBe('Downloading update: 42%')
+    expect(progress.getAttribute('aria-valuenow')).toBe('42')
+    expect(progress.getAttribute('aria-valuetext')).toBe('42%')
+    expect(progress.getAttribute('style')).toContain('42%')
   })
 
-  it('shows when the update is ready to install', () => {
+  it('offers to restart when the update is ready to install', () => {
+    const onRestart = vi.fn()
     render(
-      <UpdateNotice updateState={{ status: 'downloaded', version: '1.2.3' }} onDownload={vi.fn()} />
+      <UpdateNotice
+        updateState={{ status: 'downloaded', version: '1.2.3' }}
+        onDownload={vi.fn()}
+        onRestart={onRestart}
+      />
     )
 
-    expect(
-      screen.getByText(
-        'Update ready. It will be installed when you restart or close the application.'
-      )
-    ).not.toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Restart to install' }))
+    expect(onRestart).toHaveBeenCalledOnce()
   })
 })

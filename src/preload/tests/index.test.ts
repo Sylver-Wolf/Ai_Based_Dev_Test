@@ -7,6 +7,7 @@ type ExposedPreloadApi = {
   deleteSavedInput: (index: number) => Promise<string[]>
   getUpdateState: () => Promise<UpdateState | null>
   downloadUpdate: () => Promise<void>
+  installUpdate: () => Promise<void>
   onUpdateState: (callback: (state: UpdateState | null) => void) => () => void
 }
 
@@ -77,13 +78,15 @@ describe('preload API', () => {
     await api.deleteSavedInput(3)
     await api.getUpdateState()
     await api.downloadUpdate()
+    await api.installUpdate()
 
     expect(mocks.invoke.mock.calls).toEqual([
       ['saved-inputs:load'],
       ['saved-inputs:save', 'text'],
       ['saved-inputs:delete', 3],
       ['updates:get-state'],
-      ['updates:download']
+      ['updates:download'],
+      ['updates:install']
     ])
   })
 

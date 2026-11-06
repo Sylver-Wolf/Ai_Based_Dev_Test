@@ -11,6 +11,7 @@ const api = {
   deleteSavedInput: vi.fn<(index: number) => Promise<string[]>>(),
   getUpdateState: vi.fn<() => Promise<UpdateState | null>>(),
   downloadUpdate: vi.fn<() => Promise<void>>(),
+  installUpdate: vi.fn<() => Promise<void>>(),
   onUpdateState: vi.fn<(callback: (state: UpdateState | null) => void) => () => void>()
 }
 
@@ -67,6 +68,7 @@ describe('App', () => {
     api.deleteSavedInput.mockResolvedValue([])
     api.getUpdateState.mockResolvedValue(null)
     api.downloadUpdate.mockResolvedValue()
+    api.installUpdate.mockResolvedValue()
     api.onUpdateState.mockImplementation((callback) => {
       updateStateListener = callback
       return () => {
@@ -119,6 +121,10 @@ describe('App', () => {
     expect(api.getUpdateState).toHaveBeenCalledOnce()
     expect(api.downloadUpdate).toHaveBeenCalledOnce()
     expect(await screen.findByText('Downloading update: 42%')).not.toBeNull()
+
+    updateStateListener?.({ status: 'downloaded', version: '1.2.3' })
+    fireEvent.click(await screen.findByRole('button', { name: 'Restart to install' }))
+    expect(api.installUpdate).toHaveBeenCalledOnce()
 
     unmount()
     expect(unsubscribe).toHaveBeenCalledOnce()

@@ -10,6 +10,7 @@ const api = {
     ipcRenderer.invoke('saved-inputs:delete', index),
   getUpdateState: (): Promise<UpdateState | null> => ipcRenderer.invoke('updates:get-state'),
   downloadUpdate: (): Promise<void> => ipcRenderer.invoke('updates:download'),
+  installUpdate: (): Promise<void> => ipcRenderer.invoke('updates:install'),
   onUpdateState: (callback: (state: UpdateState | null) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, state: UpdateState | null): void => {
       callback(state)
