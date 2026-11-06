@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -24,28 +24,6 @@ function setUpdateState(state: UpdateState | null): void {
   }
 }
 
-async function promptToInstallUpdate(version: string): Promise<void> {
-  try {
-    const { response } = await dialog.showMessageBox({
-      type: 'info',
-      title: 'Update ready',
-      message: `Version ${version} has been downloaded.`,
-      detail:
-        'Would you like to restart now? Otherwise, the update will be installed when you close the application.',
-      buttons: ['Restart now', 'Later'],
-      defaultId: 0,
-      cancelId: 1,
-      noLink: true
-    })
-
-    if (response === 0) {
-      autoUpdater.quitAndInstall(false, true)
-    }
-  } catch (error) {
-    console.error('Unable to prompt to install the downloaded update:', error)
-  }
-}
-
 function checkForUpdates(): void {
   if (is.dev || process.platform !== 'win32') return
 
@@ -68,7 +46,6 @@ function checkForUpdates(): void {
   autoUpdater.on('update-downloaded', (event) => {
     autoUpdater.autoInstallOnAppQuit = true
     setUpdateState({ status: 'downloaded', version: event.version })
-    void promptToInstallUpdate(event.version)
   })
   autoUpdater.on('error', (error) => {
     console.error('Automatic update error:', error)
@@ -187,6 +164,13 @@ app.whenReady().then(() => {
   ipcMain.handle('saved-inputs:save', (_event, input: unknown) => saveInput(input))
   ipcMain.handle('saved-inputs:delete', (_event, index: unknown) => deleteSavedInput(index))
   ipcMain.handle('updates:get-state', () => updateState)
+  ipcMain.handle('updates:install', () => {
+    if (updateState?.status !== 'downloaded') {
+      throw new Error('No downloaded update is ready to install.')
+    }
+
+    autoUpdater.quitAndInstall(false, true)
+  })
   ipcMain.handle('updates:download', async () => {
     if (updateState?.status !== 'available') {
       throw new Error('No update is available to download.')

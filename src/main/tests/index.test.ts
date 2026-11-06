@@ -40,7 +40,6 @@ const mocks = vi.hoisted(() => ({
   downloadUpdate: vi.fn(),
   quitAndInstall: vi.fn(),
   updaterOn: vi.fn(),
-  showMessageBox: vi.fn(),
   openExternal: vi.fn()
 }))
 
@@ -85,7 +84,6 @@ vi.mock('electron', () => {
     },
     shell: { openExternal: mocks.openExternal },
     BrowserWindow,
-    dialog: { showMessageBox: mocks.showMessageBox },
     ipcMain: {
       on: mocks.ipcOn,
       handle: vi.fn((channel: string, handler: IPCHandler) => {
@@ -150,7 +148,6 @@ describe('main process IPC', () => {
     mocks.writeFile.mockResolvedValue(undefined)
     mocks.checkForUpdates.mockResolvedValue(undefined)
     mocks.downloadUpdate.mockResolvedValue(undefined)
-    mocks.showMessageBox.mockResolvedValue({ response: 1 })
 
     platformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
@@ -340,34 +337,29 @@ describe('main process IPC', () => {
     expect(mocks.downloadUpdate).not.toHaveBeenCalled()
   })
 
-  it('offers to restart after an update is downloaded', async () => {
-    mocks.showMessageBox.mockResolvedValue({ response: 0 })
+  it('installs a downloaded update when requested over IPC', async () => {
     await startMain()
+    await expect(invoke('updates:install')).rejects.toThrow(
+      'No downloaded update is ready to install.'
+    )
+
     emitUpdater('update-downloaded', { version: '2.1.0' })
 
-    await vi.waitFor(() => expect(mocks.showMessageBox).toHaveBeenCalledOnce())
     expect(await invoke('updates:get-state')).toEqual({
       status: 'downloaded',
       version: '2.1.0'
     })
+    await invoke('updates:install')
     expect(mocks.quitAndInstall).toHaveBeenCalledWith(false, true)
   })
 
-  it('logs a failed install prompt without disrupting the main process', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
-    mocks.showMessageBox.mockRejectedValue(new Error('dialog unavailable'))
+  it('does not install an update before its download is complete', async () => {
     await startMain()
-    emitUpdater('update-downloaded', { version: '2.1.0' })
-
-    await vi.waitFor(() => expect(consoleError).toHaveBeenCalledOnce())
-    expect(consoleError).toHaveBeenCalledWith(
-      'Unable to prompt to install the downloaded update:',
-      expect.any(Error)
+    emitUpdater('update-available', { version: '2.1.0' })
+    await expect(invoke('updates:install')).rejects.toThrow(
+      'No downloaded update is ready to install.'
     )
-    expect(await invoke('updates:get-state')).toEqual({
-      status: 'downloaded',
-      version: '2.1.0'
-    })
+    expect(mocks.quitAndInstall).not.toHaveBeenCalled()
   })
 
   it('skips update checks on Linux and configures the Linux window icon', async () => {

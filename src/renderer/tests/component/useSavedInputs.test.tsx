@@ -9,6 +9,7 @@ const api = {
   deleteSavedInput: vi.fn<(index: number) => Promise<string[]>>(),
   getUpdateState: vi.fn<() => Promise<UpdateState | null>>(),
   downloadUpdate: vi.fn<() => Promise<void>>(),
+  installUpdate: vi.fn<() => Promise<void>>(),
   onUpdateState: vi.fn<(callback: (state: UpdateState | null) => void) => () => void>()
 }
 

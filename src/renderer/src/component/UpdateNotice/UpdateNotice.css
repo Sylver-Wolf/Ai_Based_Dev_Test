@@ -10,10 +10,23 @@
   max-width: min(360px, calc(100vw - 32px));
 }
 
-.update-button {
-  min-height: 36px;
+.update-action {
+  width: 220px;
+  height: 36px;
+  padding: 0 8px;
+  white-space: nowrap;
 }
 
-.update-status {
-  margin: 0;
+.update-button {
+  background-color: var(--color-background-subtle);
+  color: var(--color-text-secondary);
+}
+
+.update-button:hover:not(:disabled) {
+  background-color: var(--button-hover-background);
+  color: var(--button-hover-text);
+}
+
+.update-progress {
+  cursor: progress;
 }

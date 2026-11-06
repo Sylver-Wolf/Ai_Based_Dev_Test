@@ -7,6 +7,7 @@ interface AppAPI {
   deleteSavedInput: (index: number) => Promise<string[]>
   getUpdateState: () => Promise<UpdateState | null>
   downloadUpdate: () => Promise<void>
+  installUpdate: () => Promise<void>
   onUpdateState: (callback: (state: UpdateState | null) => void) => () => void
 }
 
