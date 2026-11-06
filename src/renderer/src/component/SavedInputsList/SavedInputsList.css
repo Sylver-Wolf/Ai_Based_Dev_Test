@@ -119,9 +119,9 @@
 }
 
 .delete-input-button:hover:not(:disabled) {
-  border-color: var(--color-error);
-  background-color: #ff8a8a1a;
-  color: var(--color-error);
+  border-color: var(--color-highlight-danger);
+  background-color: color-mix(in srgb, var(--color-highlight-danger) 10%, transparent);
+  color: var(--color-highlight-danger);
 }
 
 .delete-input-button:disabled {

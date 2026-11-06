@@ -15,6 +15,8 @@
   --color-text-secondary: rgba(235, 235, 245, 0.6);
   --color-text-tertiary: rgba(235, 235, 245, 0.38);
   --color-error: #ff8a8a;
+  --color-highlight-primary: #6988e6;
+  --color-highlight-danger: #ff8a8a;
 
   --button-border: transparent;
   --button-text: var(--color-text-primary);
@@ -65,7 +67,7 @@ ul {
 }
 
 .button:focus-visible {
-  outline: 2px solid #6988e6;
+  outline: 2px solid var(--color-highlight-primary);
   outline-offset: 2px;
 }
 
